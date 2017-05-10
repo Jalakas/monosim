@@ -53,7 +53,7 @@ namespace monosimbase
 		public static Contacts SimContacts {get; set;}
 		public static Contacts FileContacts {get; set;}
 
-		public static string SimIccID {get; set;}
+		public static string SimICCID {get; set;}
 		public static string SimADNError {get; set;}
 		public static bool SimPin1Status {get; set;}
 		public static int SimPin1Attempts {get; set;}
@@ -173,6 +173,7 @@ namespace monosimbase
 			try
 			{
 				lenAlpha2	= (recordValue.Length - 28);
+
 				alphaID		= recordValue.Substring(0, 				lenAlpha2);
 				numLength	= recordValue.Substring(lenAlpha2,		2);
 				tonNpi		= recordValue.Substring(lenAlpha2 + 2,	2);
@@ -246,6 +247,7 @@ namespace monosimbase
 			Encoding enc = new UTF8Encoding(false, false);
 			return enc.GetString(bArray.ToArray());
 		}
+
 
 		/// <summary>
 		/// Get Unicode string from hexadecimal string

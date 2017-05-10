@@ -9,11 +9,8 @@ using comexbase;
 
 namespace monosimbase
 {
-
-
 	public static partial class GlobalObjUI
 	{
-
 		// Attributes
 		private static string simCommand = "";
 		private static string simResponse = "";
@@ -22,13 +19,10 @@ namespace monosimbase
 
 		private static List<string> ADNrecords = new List<string>();
 
-
 		// Events
 		public static event MonosimEventHandler MonosimEvent;
 
-
 		#region Public Methods
-
 
 		/// <summary>
 		/// Select sim contacts list.
@@ -49,8 +43,7 @@ namespace monosimbase
 				return lMan.GetString("needpindisable");
 			}
 
-
-			retCmd = ReadIccId();
+			retCmd = ReadICCID();
 
 			if (retCmd != "")
 			{
@@ -66,11 +59,8 @@ namespace monosimbase
 				return retCmd;
 			}
 
-
 			return "";
 		}
-
-
 
 
 		/// <summary>
@@ -88,7 +78,7 @@ namespace monosimbase
 			SimContacts = new Contacts();
 
 			// loop for each ADN records
-			for (int l=1; l<=SimADNRecordCount; l++)
+			for (int l=1; l <= SimADNRecordCount; l++)
 			{
 				// Set record id
 				SimADNPosition = l;
@@ -152,13 +142,16 @@ namespace monosimbase
 		}
 
 
+		/// <summary>
+		/// Write sim contacts list.
+		/// </summary>
 		public static void WriteSimContactsList(Contacts contacts, bool isAppend)
 		{
 			string emptyRecord = new string('F', SimADNRecordLen * 2);
 			string expRecord = "9000";
 			string retCmd = "";
 			string retRecord = "";
-			int adnRec = 0;
+			int ADNRec = 0;
 
 			// loop for each ADN records
 			for (int cid=0; cid<contacts.SimContacts.Count; cid++)
@@ -166,19 +159,19 @@ namespace monosimbase
 				if (!isAppend)
 				{
 					// first record
-					adnRec = cid + 1;
+					ADNRec = cid + 1;
 				}
 				else
 				{
 					// first empty record
-					adnRec = SimADNRecordEmptyID[cid];
+					ADNRec = SimADNRecordEmptyID[cid];
 				}
 
 				// Set record id
-				SimADNPosition = adnRec;
+				SimADNPosition = ADNRec;
 
 				// Prepare sim command
-				simCommand = "A0DC" + adnRec.ToString("X2") + "04" + SimADNRecordLen.ToString("X2");
+				simCommand = "A0DC" + ADNRec.ToString("X2") + "04" + SimADNRecordLen.ToString("X2");
 
 				retStr = PrepareRecord(contacts.SimContacts[cid], out retRecord);
 				if (retStr != "")
@@ -198,7 +191,7 @@ namespace monosimbase
 				retCmd = SendReceiveAdv(simCommand, ref simResponse, simExpResponse, ref simRespOk);
 
 				log.Debug("GlobalObjUI.Sim::WriteSimContactsList: WRITE ADN REC " +
-						  adnRec.ToString("d3") + " " + simCommand + " < " + simResponse);
+						  ADNRec.ToString("d3") + " " + simCommand + " < " + simResponse);
 
 				if (retCmd != "")
 				{
@@ -209,7 +202,6 @@ namespace monosimbase
 					MonosimEvent(new object(), new EventArgs());
 					return;
 				}
-
 
 				if (!simRespOk)
 				{
@@ -229,7 +221,7 @@ namespace monosimbase
 			if(!isAppend)
 			{
 				// delete old other records
-				for (int rid=adnRec+1; rid<=GlobalObjUI.SimADNRecordCount; rid++)
+				for (int rid=ADNRec+1; rid<=GlobalObjUI.SimADNRecordCount; rid++)
 				{
 					if (!SimADNRecordEmptyID.Contains(rid))
 					{
@@ -283,9 +275,8 @@ namespace monosimbase
 		}
 
 
-
 		/// <summary>
-		/// Delete all sim contacts list
+		/// Delete all sim contacts list.
 		/// </summary>
 		public static void DeleteAllSimContactsList()
 		{
@@ -347,7 +338,7 @@ namespace monosimbase
 
 
 		/// <summary>
-		/// Enable/Disable Pin1 on sim
+		/// Enable/Disable Pin1 on sim.
 		/// </summary>
 		public static string SetPinStatus(bool newStatus, string pin1Value)
 		{
@@ -400,8 +391,6 @@ namespace monosimbase
 
 
 		#endregion Public Methods
-
-
 		#region Private Methods
 
 
@@ -450,9 +439,9 @@ namespace monosimbase
 
 
 		/// <summary>
-		/// Extract IccID value from bytes of 2FE2 file
+		/// Extract ICCID value from bytes of 2FE2 file.
 		/// </summary>
-		private static void ExtractIccID(string fileBytes)
+		private static void ExtractICCID(string fileBytes)
 		{
 			// discart unused bytes (status words)
 			fileBytes = fileBytes.Substring(0,20);
@@ -464,14 +453,14 @@ namespace monosimbase
 				retStr += fileBytes.Substring(d+1,1) + fileBytes.Substring(d,1);
 			}
 
-			SimIccID = retStr.Replace("F", "");
+			SimICCID = retStr.Replace("F", "");
 
 			return;
 		}
 
 
 		/// <summary>
-		/// Get sim pin1 status (enabled=true or disabled=false)
+		/// Get sim pin1 status (enabled=true or disabled=false).
 		/// </summary>
 		private static string GetSimPinStatus()
 		{
@@ -532,15 +521,15 @@ namespace monosimbase
 
 
 		/// <summary>
-		/// Read IccID file (2FE2) and extract value
+		/// Read ICCID file (2FE2) and extract value.
 		/// </summary>
-		private static string ReadIccId()
+		private static string ReadICCID()
 		{
 			// Select 2FE2 (ICCID)
 			simCommand = "A0A40000022FE2";
 			simExpResponse = "9F??";
 			string retCmd = SendReceiveAdv(simCommand, ref simResponse, simExpResponse, ref simRespOk);
-			log.Debug("GlobalObjUI.Sim::ReadIccId: SELECT ICCID " + simResponse);
+			log.Debug("GlobalObjUI.Sim::ReadICCID: SELECT ICCID " + simResponse);
 
 			if (retCmd != "")
 			{
@@ -551,14 +540,13 @@ namespace monosimbase
 			{
 				return "WRONG RESPONSE [" + simExpResponse + "] " + "[" + simResponse + "]";
 			}
-
 
 			// Read 2FE2 (ICCID)
 			simCommand = "A0B000000A";
 			simExpResponse = new string('?', 20) + "9000";
 			simRespOk = false;
 			retCmd = SendReceiveAdv(simCommand, ref simResponse, simExpResponse, ref simRespOk);
-			log.Debug("GlobalObjUI.Sim::ReadIccId: READ ICCID " + simResponse);
+			log.Debug("GlobalObjUI.Sim::ReadICCID: READ ICCID " + simResponse);
 
 			if (retCmd != "")
 			{
@@ -570,17 +558,17 @@ namespace monosimbase
 				return "WRONG RESPONSE [" + simExpResponse + "] " + "[" + simResponse + "]";
 			}
 
-			// obtain IccID from reader bytes
-			ExtractIccID(simResponse);
+			// obtain ICCID from reader bytes
+			ExtractICCID(simResponse);
 
-			log.Debug("GlobalObjUI.Sim::ReadIccId: READ ICCID SWAPPED " + SimIccID);
+			log.Debug("GlobalObjUI.Sim::ReadICCID: READ ICCID SWAPPED " + SimICCID);
 
 			return "";
 		}
 
 
 		/// <summary>
-		/// Select ADN file on sim and extract main info
+		/// Select ADN file on sim and extract main info.
 		/// </summary>
 		private static string ReadADN()
 		{
@@ -652,7 +640,5 @@ namespace monosimbase
 
 
 		#endregion Private Methods
-
-
 	}
 }
