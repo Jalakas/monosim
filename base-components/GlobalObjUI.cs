@@ -10,8 +10,6 @@ using comexbase;
 
 namespace monosimbase
 {
-
-
 	public static partial class GlobalObjUI
 	{
 
@@ -21,7 +19,7 @@ namespace monosimbase
 		private static string retStr = "";
 		private static LanguageManager lMan = null;
 
-		private static int lenAlpha = 0;
+		private static int lenAlpha2 = 0;
 		private static string alphaID = "";
 		private static string numLength = "";
 		private static string tonNpi = "";
@@ -39,9 +37,6 @@ namespace monosimbase
 		/// Application folder path
 		/// </summary>
 		public static string AppPath { get; set; }
-
-
-
 
 
 		#region Properties
@@ -74,18 +69,7 @@ namespace monosimbase
 		#endregion Properties
 
 
-
-
-
-
-
-
-
-
-
 		#region Public Methods
-
-
 
 
 		/// <summary>
@@ -135,9 +119,6 @@ namespace monosimbase
 		}
 
 
-
-
-
 		/// <summary>
 		/// Extract contacts from ADN records
 		/// </summary>
@@ -159,11 +140,6 @@ namespace monosimbase
 		}
 
 
-
-
-
-
-
 		/// <summary>
 		/// Check for contacts with description chars len > MaxAlphaCharsLen
 		/// </summary>
@@ -183,19 +159,7 @@ namespace monosimbase
 		}
 
 
-
-
 		#endregion Public Methods
-
-
-
-
-
-
-
-
-
-
 
 
 		#region Private Methods
@@ -208,18 +172,20 @@ namespace monosimbase
 		{
 			try
 			{
-				lenAlpha = (recordValue.Length-28)/2;
-				alphaID = recordValue.Substring(0, (lenAlpha * 2));
-				numLength = recordValue.Substring((lenAlpha * 2), 2);
-				tonNpi = recordValue.Substring((lenAlpha * 2) + 2, 2);
-				dialNum = recordValue.Substring((lenAlpha * 2) + 4, 20);
-				// configId = recordValue.Substring((lenAlpha * 2) + 24, 2);
-				// ext1Rec = recordValue.Substring((lenAlpha * 2) + 26, 2);
-				tonNpiNumber = Convert.ToInt32(tonNpi,16);
+				lenAlpha2	= (recordValue.Length - 28);
+				alphaID		= recordValue.Substring(0, 				lenAlpha2);
+				numLength	= recordValue.Substring(lenAlpha2,		2);
+				tonNpi		= recordValue.Substring(lenAlpha2 + 2,	2);
+				dialNum		= recordValue.Substring(lenAlpha2 + 4,	20);
+				// configId	= recordValue.Substring(lenAlpha2 + 24,	2);
+				// ext1Rec	= recordValue.Substring(lenAlpha2 + 26,	2);
 
-				alphaID = AsciiFromHex(alphaID);
-				alphaID = alphaID.Replace(((char)255).ToString() , "");
+				if (alphaID.Substring(0, 2) == "80") alphaID = HexToUnicode(alphaID);
+				else alphaID = HexToASCII(alphaID);
+
 				dialNum = SwapNumber(dialNum, (Convert.ToInt32(numLength, 16)-1) * 2);
+
+				tonNpiNumber = Convert.ToInt32(tonNpi, 16);
 
 				if ((tonNpiNumber&16) > 0)
 				{
@@ -243,28 +209,70 @@ namespace monosimbase
 		}
 
 
-
-
-
-
 		/// <summary>
 		/// Get ASCII string from hexadecimal string
 		/// </summary>
-		private static string AsciiFromHex(string hexValue)
+		private static string HexToASCII(string hexValue)
 		{
 			List<byte> bArray = new List<byte>();
-			for (int b=0; b<hexValue.Length; b+=2)
+			string curHexValue = "";
+
+			for (int b=0; b < hexValue.Length; b+=2)
 			{
-				// check for no empty byte
-				if (hexValue.Substring(b,2) != "FF")
+				curHexValue = hexValue.Substring(b, 2);
+
+				if (Convert.ToInt32(curHexValue, 16) < 32)
 				{
-					bArray.Add(byte.Parse(hexValue.Substring(b,2), System.Globalization.NumberStyles.AllowHexSpecifier));
+					log.Debug("GlobalObjUI::HexToASCII: Found 0x" + curHexValue + ", ignoring non symbol character");
+					continue;
+				}
+				else if (curHexValue == "EF" || curHexValue == "BF" || curHexValue == "BD")
+				{
+					log.Debug("GlobalObjUI::HexToASCII: Found 0x" + curHexValue + ", some symbols are probably lost");
+					continue;
+				}
+				else if (curHexValue == "81")
+				{
+					log.Debug("GlobalObjUI::HexToASCII: Found 0x" + curHexValue + ", ignoring 3 bytes from beginning");
+					b+=4;
+					continue;
+				}
+				else if (curHexValue != "FF")		// check for no empty byte
+				{
+					bArray.Add(byte.Parse(curHexValue, System.Globalization.NumberStyles.AllowHexSpecifier));
 				}
 			}
 
-			return UTF8Encoding.UTF8.GetString(bArray.ToArray());
+			Encoding enc = new UTF8Encoding(false, false);
+			return enc.GetString(bArray.ToArray());
 		}
 
+		/// <summary>
+		/// Get Unicode string from hexadecimal string
+		/// </summary>
+		private static string HexToUnicode(string hexValue)
+		{
+			List<byte> bArray = new List<byte>();
+			string curHexValue = "";
+
+			for (int b=0; b < hexValue.Length; b+=2)
+			{
+				curHexValue = hexValue.Substring(b, 2);
+
+				if (curHexValue == "80")		// check for unicode
+				{
+					log.Debug("GlobalObjUI::HexToUnicode: Found 0x" + curHexValue + ", already using Unicode for conversion");
+					continue;
+				}
+				else if (curHexValue != "FF")	// check for no empty byte
+				{
+					bArray.Add(byte.Parse(curHexValue, System.Globalization.NumberStyles.AllowHexSpecifier));
+				}
+			}
+
+			Encoding enc = new UnicodeEncoding(true, false);
+			return enc.GetString(bArray.ToArray());
+		}
 
 
 		/// <summary>
@@ -282,9 +290,6 @@ namespace monosimbase
 
 			return hexOut;
 		}
-
-
-
 
 
 		/// <summary>
@@ -307,9 +312,6 @@ namespace monosimbase
 
 			return outNumber;
 		}
-
-
-
 
 
 		/// <summary>
@@ -375,18 +377,8 @@ namespace monosimbase
 		}
 
 
-
-
-
-
 		#endregion Private Methods
 
 
-
-
-
-
 	}
-
-
 }

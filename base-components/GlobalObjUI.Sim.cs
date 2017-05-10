@@ -23,16 +23,11 @@ namespace monosimbase
 		private static List<string> ADNrecords = new List<string>();
 
 
-
 		// Events
 		public static event MonosimEventHandler MonosimEvent;
 
 
 		#region Public Methods
-
-
-
-
 
 
 		/// <summary>
@@ -155,9 +150,6 @@ namespace monosimbase
 			MonosimEvent(new object(), new EventArgs());
 
 		}
-
-
-
 
 
 		public static void WriteSimContactsList(Contacts contacts, bool isAppend)
@@ -354,8 +346,6 @@ namespace monosimbase
 		}
 
 
-
-
 		/// <summary>
 		/// Enable/Disable Pin1 on sim
 		/// </summary>
@@ -409,23 +399,10 @@ namespace monosimbase
 		}
 
 
-
-
-
 		#endregion Public Methods
 
 
-
-
-
-
-
-
-
-
 		#region Private Methods
-
-
 
 
 		/// <summary>
@@ -472,8 +449,6 @@ namespace monosimbase
 		}
 
 
-
-
 		/// <summary>
 		/// Extract IccID value from bytes of 2FE2 file
 		/// </summary>
@@ -493,11 +468,6 @@ namespace monosimbase
 
 			return;
 		}
-
-
-
-
-
 
 
 		/// <summary>
@@ -561,9 +531,6 @@ namespace monosimbase
 		}
 
 
-
-
-
 		/// <summary>
 		/// Read IccID file (2FE2) and extract value
 		/// </summary>
@@ -612,8 +579,6 @@ namespace monosimbase
 		}
 
 
-
-
 		/// <summary>
 		/// Select ADN file on sim and extract main info
 		/// </summary>
@@ -653,7 +618,6 @@ namespace monosimbase
 			}
 
 
-
 			// Get Response 6F3A (ADN)
 			simCommand = "A0C00000" + simResponse.Substring(2,2);
 			simExpResponse = new string('?', Convert.ToInt32(simResponse.Substring(2,2), 16) * 2) + "9000";
@@ -687,14 +651,7 @@ namespace monosimbase
 		}
 
 
-
-
-
-
 		#endregion Private Methods
-
-
-
 
 
 	}
