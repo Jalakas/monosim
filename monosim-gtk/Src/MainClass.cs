@@ -76,7 +76,7 @@ namespace monosimgtk
 			catch (Exception Ex)
 			{
 				// error detected
-				log.Error("GlobalObjUI::SetLanguage: " + Ex.Message + "\r\n" + Ex.StackTrace);
+				log.Error("MainClass::Main: " + Ex.Message + "\r\n" + Ex.StackTrace);
 				ShowMessage(null, "LANGUAGE SET ERROR", Ex.Message, MessageType.Error);
 				return;
 			}

@@ -509,7 +509,7 @@ namespace monosimbase
 			simCommand = "A0A40000023F00";
 			simExpResponse = "9F??";
 			string retCmd = SendReceiveAdv(simCommand, ref simResponse, simExpResponse, ref simRespOk);
-			log.Debug("GlobalObjUI::GetSimPinStatus: SELECT MF " + simResponse);
+			log.Debug("GlobalObjUI.Sim::GetSimPinStatus: SELECT MF " + simResponse);
 
 			if (retCmd != "")
 			{
@@ -526,7 +526,7 @@ namespace monosimbase
 			simCommand = "A0C00000" + simResponse.Substring(2,2);
 			simExpResponse = new string('?', (Convert.ToInt32(simResponse.Substring(2,2), 16) * 2)) + "9000";
 			retCmd = SendReceiveAdv(simCommand, ref simResponse, simExpResponse, ref simRespOk);
-			log.Debug("GlobalObjUI::GetSimPinStatus: GET RESPONSE " + simResponse);
+			log.Debug("GlobalObjUI.Sim::GetSimPinStatus: GET RESPONSE " + simResponse);
 
 			if (retCmd != "")
 			{
@@ -543,18 +543,18 @@ namespace monosimbase
 			{
 				// Enabled
 				SimPin1Status = true;
-				log.Debug("GlobalObjUI::GetSimPinStatus: PIN1 ENABLED");
+				log.Debug("GlobalObjUI.Sim::GetSimPinStatus: PIN1 ENABLED");
 			}
 			else
 			{
 				// Disabled
 				SimPin1Status = false;
-				log.Debug("GlobalObjUI::GetSimPinStatus: PIN1 DISABLED");
+				log.Debug("GlobalObjUI.Sim::GetSimPinStatus: PIN1 DISABLED");
 			}
 
 			// Get remaining attempts
 			SimPin1Attempts = Convert.ToInt32(simResponse.Substring(37,1), 16);
-			log.Debug("GlobalObjUI::GetSimPinStatus: PIN1 VERIFY ATTEMPTS: " + SimPin1Attempts.ToString());
+			log.Debug("GlobalObjUI.Sim::GetSimPinStatus: PIN1 VERIFY ATTEMPTS: " + SimPin1Attempts.ToString());
 
 			return "";
 
@@ -573,7 +573,7 @@ namespace monosimbase
 			simCommand = "A0A40000022FE2";
 			simExpResponse = "9F??";
 			string retCmd = SendReceiveAdv(simCommand, ref simResponse, simExpResponse, ref simRespOk);
-			log.Debug("GlobalObjUI::ReadIccId: SELECT ICCID " + simResponse);
+			log.Debug("GlobalObjUI.Sim::ReadIccId: SELECT ICCID " + simResponse);
 
 			if (retCmd != "")
 			{
@@ -591,7 +591,7 @@ namespace monosimbase
 			simExpResponse = new string('?', 20) + "9000";
 			simRespOk = false;
 			retCmd = SendReceiveAdv(simCommand, ref simResponse, simExpResponse, ref simRespOk);
-			log.Debug("GlobalObjUI::ReadIccId: READ ICCID " + simResponse);
+			log.Debug("GlobalObjUI.Sim::ReadIccId: READ ICCID " + simResponse);
 
 			if (retCmd != "")
 			{
@@ -606,7 +606,7 @@ namespace monosimbase
 			// obtain IccID from reader bytes
 			ExtractIccID(simResponse);
 
-			log.Debug("GlobalObjUI::ReadIccId: READ ICCID SWAPPED " + SimIccID);
+			log.Debug("GlobalObjUI.Sim::ReadIccId: READ ICCID SWAPPED " + SimIccID);
 
 			return "";
 		}
@@ -623,7 +623,7 @@ namespace monosimbase
 			simCommand = "A0A40000027F10";
 			simExpResponse = "9F??";
 			string retCmd = SendReceiveAdv(simCommand, ref simResponse, simExpResponse, ref simRespOk);
-			log.Debug("GlobalObjUI::ReadADN: SELECT DF TELECOM " + simResponse);
+			log.Debug("GlobalObjUI.Sim::ReadADN: SELECT DF TELECOM " + simResponse);
 
 			if (retCmd != "")
 			{
@@ -640,7 +640,7 @@ namespace monosimbase
 			simCommand = "A0A40000026F3A";
 			simExpResponse = "9F??";
 			retCmd = SendReceiveAdv(simCommand, ref simResponse, simExpResponse, ref simRespOk);
-			log.Debug("GlobalObjUI::ReadADN: SELECT ADN " + simResponse);
+			log.Debug("GlobalObjUI.Sim::ReadADN: SELECT ADN " + simResponse);
 
 			if (retCmd != "")
 			{
@@ -658,7 +658,7 @@ namespace monosimbase
 			simCommand = "A0C00000" + simResponse.Substring(2,2);
 			simExpResponse = new string('?', Convert.ToInt32(simResponse.Substring(2,2), 16) * 2) + "9000";
 			retCmd = SendReceiveAdv(simCommand, ref simResponse, simExpResponse, ref simRespOk);
-			log.Debug("GlobalObjUI::ReadADN: GET RESPONSE " + simResponse);
+			log.Debug("GlobalObjUI.Sim::ReadADN: GET RESPONSE " + simResponse);
 
 			if (retCmd != "")
 			{
@@ -677,10 +677,10 @@ namespace monosimbase
 			SimADNRecordCount = GlobalObjUI.SimADNFileLen / GlobalObjUI.SimADNRecordLen;
 			SimADNMaxAlphaChars = GlobalObjUI.SimADNRecordLen - 14;
 
-			log.Debug("GlobalObjUI::ReadADN: File len ...... : " + SimADNFileLen.ToString());
-			log.Debug("GlobalObjUI::ReadADN: Record len .... : " + SimADNRecordLen.ToString());
-			log.Debug("GlobalObjUI::ReadADN: Record count .. : " + SimADNRecordCount.ToString());
-			log.Debug("GlobalObjUI::ReadADN: Max Alpha chars : " + SimADNMaxAlphaChars.ToString());
+			log.Debug("GlobalObjUI.Sim::ReadADN: File len ...... : " + SimADNFileLen.ToString());
+			log.Debug("GlobalObjUI.Sim::ReadADN: Record len .... : " + SimADNRecordLen.ToString());
+			log.Debug("GlobalObjUI.Sim::ReadADN: Record count .. : " + SimADNRecordCount.ToString());
+			log.Debug("GlobalObjUI.Sim::ReadADN: Max Alpha chars : " + SimADNMaxAlphaChars.ToString());
 
 
 			return "";
