@@ -9,11 +9,11 @@ namespace monosimbase
 	/// </summary>
 	public class LanguageManager
 	{
-		
+
 		// Attributes
 		XmlDocument xmlDoc;
-		
-		
+
+
 		/// <summary>
 		/// Costructor
 		/// </summary>
@@ -21,23 +21,23 @@ namespace monosimbase
 		{
 			// Load Resource file
 			xmlDoc = new XmlDocument();
-			xmlDoc.Load(resourceFilePath);				
-			
+			xmlDoc.Load(resourceFilePath);
+
 		}
 
-		
-		
+
+
 		/// <summary>
 		/// Get value of requested key
 		/// </summary>
 		public string GetString(string keyName)
 		{
-			XmlNode xmlDocNode = xmlDoc.SelectSingleNode("/Settings/language/" + keyName);				
+			XmlNode xmlDocNode = xmlDoc.SelectSingleNode("/Settings/language/" + keyName);
 			return xmlDocNode.InnerText;
 		}
-		
-		
-		
+
+
+
 	}
 
 }

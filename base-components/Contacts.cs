@@ -7,7 +7,7 @@ namespace monosimbase
 	{
 		// Properties
 		public List<Contact> SimContacts {get; set;}
-		
+
 		/// <summary>
 		/// Constructor
 		/// </summary>
@@ -15,9 +15,9 @@ namespace monosimbase
 		{
 			SimContacts = new List<Contact>();
 		}
-		
-		
-		
+
+
+
 		public bool Contains(string contactDescription)
 		{
 			if (FindIndex(contactDescription) >= 0)
@@ -26,9 +26,9 @@ namespace monosimbase
 			}
 			return false;
 		}
-		
-		
-		
+
+
+
 		public int FindIndex(string contactDescription)
 		{
 			for (int cnt=0; cnt<SimContacts.Count; cnt++ )
@@ -40,12 +40,12 @@ namespace monosimbase
 			}
 			return -1;
 		}
-		
-		
-		
-		
-		
-		
+
+
+
+
+
+
 	}
 }
 
