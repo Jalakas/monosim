@@ -65,6 +65,7 @@ namespace monosimbase
 		public static int SimADNRecordNoEmpty {get; set;}
 		public static int SimADNMaxAlphaChars {get; set;}
 		public static List<int> SimADNRecordEmptyID {get; set;}
+		public static int SimADNVersion {get; set;}
 
 		#endregion Properties
 
@@ -205,7 +206,6 @@ namespace monosimbase
 
 			// add phone number and description for new founded contact
 			SimContacts.SimContacts.Add(new Contact(alphaID, dialNum));
-
 			return "";
 		}
 
