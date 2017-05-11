@@ -201,7 +201,13 @@ namespace monosimbase
 			{
 				curHexValue = hexValue.Substring(b, 2);
 
-				if (Convert.ToInt32(curHexValue, 16) < 32)
+				if (curHexValue == "11")
+				{
+					log.Debug("GlobalObjUI::HexToASCII: Found 0x" + curHexValue + ", non symbol character, replacing it with _");
+					curHexValue = "5F";
+					bArray.Add(byte.Parse(curHexValue, System.Globalization.NumberStyles.AllowHexSpecifier));
+				}
+				else if (Convert.ToInt32(curHexValue, 16) < 32)
 				{
 					log.Debug("GlobalObjUI::HexToASCII: Found 0x" + curHexValue + ", ignoring non symbol character");
 					continue;
@@ -217,7 +223,7 @@ namespace monosimbase
 					b+=4;
 					continue;
 				}
-				else if (curHexValue != "FF")		// check for no empty byte
+				else if (curHexValue != "FF")	// check for no empty byte
 				{
 					bArray.Add(byte.Parse(curHexValue, System.Globalization.NumberStyles.AllowHexSpecifier));
 				}
