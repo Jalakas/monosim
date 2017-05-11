@@ -14,30 +14,22 @@ using monosimbase;
 
 namespace monosimgtk
 {
-	
-	
+
+
 	public partial class MainWindowClass
 	{
-		
-		
 		// Attributes
 		private string retStr = "";
 		private string ATR = "";
 		private ThreadNotify notify = null;
 		private System.Threading.Thread simThread = null;
-		
-		
-		
-		
-		
-		
-		
-		
+
+
+		#region Public Methods
+		#endregion Public Methods
 		#region Private methods
-		
-		
-		
-		
+
+
 		/// <summary>
 		/// Perform change of selected reader
 		/// </summary>
@@ -47,13 +39,8 @@ namespace monosimgtk
 			GlobalObj.SelectedReader = newSelReader;
 			StatusBar.Push(1, GlobalObj.LMan.GetString("selreader") + ": " + newSelReader);
 		}
-		
-		
-		
-		
-		
-		
-		
+
+
 		private void NewContactsFile()
 		{
 			lstFileContacts.Clear();
@@ -61,59 +48,54 @@ namespace monosimgtk
 			GlobalObjUI.ContactsFilePath = "";
 			UpdateFileControls(true);
 		}
-		
-		
-		
-		
-		
-		
+
+
 		private void OpenContactsFile()
 		{
 			GlobalObjUI.ContactsFilePath = "";
-			
-			// New dialog for select contacts file 
-			Gtk.FileChooserDialog FileBox = new Gtk.FileChooserDialog(GlobalObjUI.LMan.GetString("openfileact"), 
-			                                MainWindow,
-			                                FileChooserAction.Open, 
-			                                GlobalObjUI.LMan.GetString("cancellbl"), Gtk.ResponseType.Cancel,
-                                            GlobalObjUI.LMan.GetString("openlbl"), Gtk.ResponseType.Accept);
-			
+
+			// New dialog for select contacts file
+			Gtk.FileChooserDialog FileBox = new Gtk.FileChooserDialog(GlobalObjUI.LMan.GetString("openfileact"),
+											MainWindow,
+											FileChooserAction.Open,
+											GlobalObjUI.LMan.GetString("cancellbl"), Gtk.ResponseType.Cancel,
+											GlobalObjUI.LMan.GetString("openlbl"), Gtk.ResponseType.Accept);
+
 			// Filter for using only monosim files
-			Gtk.FileFilter myFilter = new Gtk.FileFilter(); 
+			Gtk.FileFilter myFilter = new Gtk.FileFilter();
 			myFilter.AddPattern("*.monosim");
 			myFilter.Name = "monosim files";
 			FileBox.AddFilter(myFilter);
-			
+
 			// Manage result of dialog box
 			FileBox.Icon = Gdk.Pixbuf.LoadFromResource("monosim.png");
 			int retFileBox = FileBox.Run();
 			if ((ResponseType)retFileBox == Gtk.ResponseType.Accept)
-			{	
+			{
 				// path of a right file returned
 				GlobalObjUI.ContactsFilePath = FileBox.Filename;
-				
+
 				FileBox.Destroy();
-				FileBox.Dispose();				
+				FileBox.Dispose();
 			}
 			else
 			{
-				// nothing returned				
+				// nothing returned
 				FileBox.Destroy();
 				FileBox.Dispose();
 				return;
 			}
-			
-			
+
 			// Update gui
-			UpdateFileControls(false);			
+			UpdateFileControls(false);
 			lstFileContacts.Clear();
 			MainClass.GtkWait();
-			
+
 			try
 			{
 				GlobalObjUI.FileContacts = new Contacts();
 				StreamReader sr = new StreamReader(GlobalObjUI.ContactsFilePath);
-				string descRow = sr.ReadLine();			
+				string descRow = sr.ReadLine();
 				string phoneRow = "";
 				while (!sr.EndOfStream)
 				{
@@ -123,14 +105,14 @@ namespace monosimgtk
 					{
 						GlobalObjUI.FileContacts.SimContacts.Add(new Contact(descRow, phoneRow));
 					}
-					
+
 					// read new contact description
 					descRow = sr.ReadLine();
 				}
 				sr.Close();
 				sr.Dispose();
-				sr = null;			
-				
+				sr = null;
+
 			}
 			catch (Exception Ex)
 			{
@@ -138,20 +120,17 @@ namespace monosimgtk
 				MainClass.ShowMessage(MainWindow, "ERROR", Ex.Message, MessageType.Error);
 				return;
 			}
-			
+
 			// loop to append data readed from file
 			foreach(Contact cnt in GlobalObjUI.FileContacts.SimContacts)
 			{
 				lstFileContacts.AppendValues(new string[]{cnt.Description, cnt.PhoneNumber});
 			}
-			
+
 			UpdateFileControls(true);
-			
 		}
-		
-		
-		
-		
+
+
 		/// <summary>
 		/// Save file contacts on file.
 		/// </summary>
@@ -159,36 +138,36 @@ namespace monosimgtk
 		{
 			MessageDialog mdlg = null;
 			string fileToSave = "";
-			
+
 			if (GlobalObjUI.ContactsFilePath != "")
 			{
 				mdlg = new MessageDialog(MainWindow,
-				                         DialogFlags.Modal,
-				                         MessageType.Question,
-				                         ButtonsType.YesNo, 
-					                     GlobalObjUI.LMan.GetString("override") + "\r\n" + 
-					                     Path.GetFileNameWithoutExtension(GlobalObjUI.ContactsFilePath));
+										 DialogFlags.Modal,
+										 MessageType.Question,
+										 ButtonsType.YesNo,
+										 GlobalObjUI.LMan.GetString("override") + "\r\n" +
+										 Path.GetFileNameWithoutExtension(GlobalObjUI.ContactsFilePath));
 				mdlg.TransientFor = MainWindow;
 				mdlg.Title = MainClass.AppNameVer + " - " + GlobalObjUI.LMan.GetString("savefileact");
 				ResponseType respType = (ResponseType)mdlg.Run();
-				
+
 				if (respType == ResponseType.Yes)
 				{
 					// override
 					mdlg.Destroy();
 					mdlg.Dispose();
 					mdlg = null;
-					
+
 					WriteContactsOnFile(GlobalObjUI.ContactsFilePath, GlobalObjUI.FileContacts.SimContacts);
 					return;
 				}
-				
+
 				mdlg.Destroy();
 				mdlg.Dispose();
 				mdlg = null;
-				
+
 			}
-			
+
 			// select new file to save
 			fileToSave = ChooseFileToSave(GlobalObjUI.LMan.GetString("savefileact"));
 			if (fileToSave == "")
@@ -196,16 +175,13 @@ namespace monosimgtk
 				// no file selected
 				return;
 			}
-			
+
 			WriteContactsOnFile(fileToSave, GlobalObjUI.FileContacts.SimContacts);
 			GlobalObjUI.ContactsFilePath = fileToSave;
-			
+
 		}
-		
-		
-		
-		
-		
+
+
 		private void SaveContactsFileOnSim()
 		{
 			// check for contacts description chars len
@@ -218,58 +194,54 @@ namespace monosimgtk
 					+ "<b>" + GlobalObjUI.SimADNMaxAlphaChars.ToString() + "</b>", MessageType.Warning);
 				return;
 			}
-			
-			SelectWriteModeDialogClass swmdc = 
+
+			SelectWriteModeDialogClass swmdc =
 				new SelectWriteModeDialogClass(MainWindow, GlobalObjUI.LMan.GetString("savefilesimact"));
-			
+
 			int retMode = swmdc.Show();
-			
+
 			if (retMode < 0)
 			{
 				// cancel button pressed
 				return;
 			}
-			
+
 			log.Debug("MainWindowClass::SaveContactsFileOnSim: SELECTED SIM WRITE MODE: " + retMode.ToString());
 			if (retMode == 1)
-			{			
-				WriteContactsOnSim(GlobalObjUI.FileContacts, true);	
+			{
+				WriteContactsOnSim(GlobalObjUI.FileContacts, true);
 			}
 			else
 			{
-				WriteContactsOnSim(GlobalObjUI.FileContacts, false);	
+				WriteContactsOnSim(GlobalObjUI.FileContacts, false);
 			}
-		}		
-		
-		
-		
-		
+		}
+
+
 		private void CloseContactsFile()
 		{
 			lstFileContacts.Clear();
 			GlobalObjUI.ContactsFilePath = "";
 			UpdateFileControls(false);
 		}
-		
-		
-		
-		
+
+
 		/// <summary>
 		/// Perform sim card connection and contacts read.
 		/// </summary>
-		private void SimConnect()
+		private void SimConnect(bool extended=false)
 		{
 			MainClass.GtkWait();
-			
+
 			if (GlobalObj.IsPowered)
 			{
 				// Disconnect card if needed
 				GlobalObj.CloseConnection();
 			}
-			
+
 			// Connect to smartcard
 			retStr = GlobalObj.AnswerToReset(ref ATR);
-			
+
 			// check for error
 			if (retStr != "")
 			{
@@ -278,10 +250,10 @@ namespace monosimgtk
 				MainClass.ShowMessage(MainWindow, "ERROR", retStr, MessageType.Error);
 				return;
 			}
-			
-			// read sim contacts and fill list
-			retStr = GlobalObjUI.SelectSimContactsList();
-			
+
+			// read sim contacts and fill list (first time false=main list and second time true=extended list)
+			retStr = GlobalObjUI.SelectSimContactsList(extended);
+
 			// check for error
 			if (retStr != "")
 			{
@@ -293,57 +265,51 @@ namespace monosimgtk
 					return;
 				}
 				else
-				{					
+				{
 					// error on reading contacts list
 					GlobalObj.CloseConnection();
 					MainClass.ShowMessage(MainWindow, "ERROR", retStr, MessageType.Error);
 					return;
 				}
 			}
-			
+
 			ScanSimBefore();
-			lstSimContacts.Clear();
-			
+			if (extended==false) lstSimContacts.Clear();
+
 			// Reset status values
 			GlobalObjUI.SimADNStatus = 1;
 			GlobalObjUI.SimADNPosition = 0;
 			GlobalObjUI.SimADNError = "";
-			
-            // Start thread for reading process
-            notify = new ThreadNotify(new ReadyEvent(ReadingUpdate));
-            simThread = new System.Threading.Thread(new System.Threading.ThreadStart(GlobalObjUI.ReadSimContactsList));
-            simThread.Start();
 
+			// Start thread for reading process
+			notify = new ThreadNotify(new ReadyEvent(ReadingUpdate));
+			simThread = new System.Threading.Thread(new System.Threading.ThreadStart(GlobalObjUI.ReadSimContactsList));
+			simThread.Start();
 		}
-		
-		
-		
+
+
 		/// <summary>
 		/// Start sim update thread
 		/// </summary>
 		private void SimUpdate(Contacts cnts, bool isAppend)
 		{
 			ScanSimBefore();
-			
+
 			// Reset status values
 			GlobalObjUI.SimADNStatus = 1;
 			GlobalObjUI.SimADNPosition = 0;
 			GlobalObjUI.SimADNError = "";
-			
-            // Start thread for reading process
-            notify = new ThreadNotify(new ReadyEvent(WritingUpdate));
+
+			// Start thread for reading process
+			notify = new ThreadNotify(new ReadyEvent(WritingUpdate));
 			System.Threading.ThreadStart threadStart = delegate() {
 				GlobalObjUI.WriteSimContactsList(cnts, isAppend);
 			};
-            simThread = new System.Threading.Thread(threadStart);
-            simThread.Start();
-
+			simThread = new System.Threading.Thread(threadStart);
+			simThread.Start();
 		}
-		
-		
-		
-		
-		
+
+
 		/// <summary>
 		/// Disconnect sim card from reader
 		/// </summary>
@@ -353,10 +319,9 @@ namespace monosimgtk
 			UpdateSimControls(false);
 			lstSimContacts.Clear();
 			MainClass.GtkWait();
-			
 		}
-		
-		
+
+
 		private void SimChangePin()
 		{
 			// check for Pin1 check attempts
@@ -374,20 +339,20 @@ namespace monosimgtk
 					GlobalObjUI.LMan.GetString("pinsimchk4"),MessageType.Warning);
 				return;
 			}
-			
+
 			// Change Pin1 dialog
 			ChangePinStatusDialogClass cpsdc = new ChangePinStatusDialogClass(MainWindow);
 			string pin1 = cpsdc.Show();
-			
+
 			if (pin1 == null)
 			{
 				// cancel button pressed
 				return;
 			}
-			
+
 			// Perform Pin1 status change
 			retStr = GlobalObjUI.SetPinStatus(!GlobalObjUI.SimPin1Status, pin1);
-			
+
 			if (retStr != "")
 			{
 				// error detected during Pin1 status change
@@ -395,17 +360,16 @@ namespace monosimgtk
 					retStr,MessageType.Error);
 				return;
 			}
-			
+
 			// Pin1 status changed, reconnect sim now
 			MainClass.ShowMessage(MainWindow, GlobalObjUI.LMan.GetString("pinsimact"),
 					GlobalObjUI.LMan.GetString("pinsimdone"), MessageType.Info);
-			
+
 			// Force sim disconnect
 			SimDisconnect();
 		}
-		
-		
-		
+
+
 		private void SaveContactsSim()
 		{
 			// check for contacts description chars len
@@ -418,32 +382,30 @@ namespace monosimgtk
 					+ "<b>" + GlobalObjUI.SimADNMaxAlphaChars.ToString() + "</b>", MessageType.Warning);
 				return;
 			}
-			
-			SelectWriteModeDialogClass swmdc = 
+
+			SelectWriteModeDialogClass swmdc =
 				new SelectWriteModeDialogClass(MainWindow, GlobalObjUI.LMan.GetString("savesimact"));
-			
+
 			int retMode = swmdc.Show();
-			
+
 			if (retMode < 0)
 			{
 				// cancel button pressed
 				return;
 			}
-			
+
 			log.Debug("MainWindowClass::SaveContactsSim: SELECTED SIM WRITE MODE: " + retMode.ToString());
 			if (retMode == 1)
-			{			
-				WriteContactsOnSim(GlobalObjUI.SimContacts, true);	
+			{
+				WriteContactsOnSim(GlobalObjUI.SimContacts, true);
 			}
 			else
 			{
-				WriteContactsOnSim(GlobalObjUI.SimContacts, false);	
+				WriteContactsOnSim(GlobalObjUI.SimContacts, false);
 			}
 		}
-		
-		
-		
-		
+
+
 		/// <summary>
 		/// Save sim contacts on file
 		/// </summary>
@@ -455,96 +417,87 @@ namespace monosimgtk
 				// no file selected
 				return;
 			}
-			
 			WriteContactsOnFile(fileToSave, GlobalObjUI.SimContacts.SimContacts);
 		}
-		
-		
-		
-		
+
+
 		private void DeleteContactsSim()
 		{
 			MessageDialog mdlg = new MessageDialog(MainWindow,
-			                         DialogFlags.Modal,
-			                         MessageType.Question,
-			                         ButtonsType.YesNo, 
-				                     GlobalObjUI.LMan.GetString("suredeletesim"));
+									 DialogFlags.Modal,
+									 MessageType.Question,
+									 ButtonsType.YesNo,
+									 GlobalObjUI.LMan.GetString("suredeletesim"));
 			mdlg.TransientFor = MainWindow;
 			mdlg.Title = MainClass.AppNameVer + " - " + GlobalObjUI.LMan.GetString("deletesimact");
 			ResponseType respType = (ResponseType)mdlg.Run();
-			
+
 			if (respType == ResponseType.Yes)
 			{
 				// override
 				mdlg.Destroy();
 				mdlg.Dispose();
 				mdlg = null;
-				
+
 				// Delete sim
 				ScanSimBefore();
-				
+
 				// Reset status values
 				GlobalObjUI.SimADNStatus = 1;
 				GlobalObjUI.SimADNPosition = 0;
 				GlobalObjUI.SimADNError = "";
-				
-	            // Start thread for reading process
-	            notify = new ThreadNotify(new ReadyEvent(WritingUpdate));
-	            simThread = new System.Threading.Thread(new System.Threading.ThreadStart(GlobalObjUI.DeleteAllSimContactsList));
-	            simThread.Start();
-			
+
+				// Start thread for reading process
+				notify = new ThreadNotify(new ReadyEvent(WritingUpdate));
+				simThread = new System.Threading.Thread(new System.Threading.ThreadStart(GlobalObjUI.DeleteAllSimContactsList));
+				simThread.Start();
+
 				return;
 			}
-			
+
 			mdlg.Destroy();
 			mdlg.Dispose();
 			mdlg = null;
-			
 
 		}
-		
-		
-		
-		
-		
-		
-		
+
+
 		/// <summary>
 		/// Updates during sim contacts reading
 		/// </summary>
 		private void ReadingUpdate()
 		{
 			PBar.Adjustment.Value = (double)GlobalObjUI.SimADNPosition;
-			StatusBar.Push(1, GlobalObjUI.LMan.GetString("readcontact") + 
-				              GlobalObjUI.SimADNPosition.ToString("d3"));
+			StatusBar.Push(1, GlobalObjUI.LMan.GetString("readcontact") +
+							  GlobalObjUI.SimADNPosition.ToString("d3"));
 			MainClass.GtkWait();
-			
-			
+
+
 			if (GlobalObjUI.SimADNStatus == 3)
 			{
 				// End with errors
 				MainClass.ShowMessage(MainWindow, "ERROR", GlobalObjUI.SimADNError, MessageType.Error);
-				
+
 				// Update gui widgets properties
 				ScanSimAfter();
-				
+
 				// update gui widgets with results
 				UpdateSimControls(false);
 			}
-			
+
 			if (GlobalObjUI.SimADNStatus == 2)
 			{
 				// Extract contacts from records
 				retStr = GlobalObjUI.FromRecordsToContacts();
-				
+
 				if (retStr != "")
 				{
 					// error detected
 					MainClass.ShowMessage(MainWindow, "ERROR", retStr, MessageType.Error);
-				
+
 					// Update gui widgets properties
 					ScanSimAfter();
-					
+
 					// update gui widgets with results
 					UpdateSimControls(false);
 				}
@@ -555,31 +508,36 @@ namespace monosimgtk
 					{
 						lstSimContacts.AppendValues(new string[]{cnt.Description, cnt.PhoneNumber });
 					}
-					
+
+					if (GlobalObjUI.SimADNextended == false)
+					{
+						log.Debug("MainWindowClass::ReadingUpdate: finished reading ADN, let's try ADN extended read");
+						GlobalObjUI.SimADNextended = true;
+						SimConnect(true);
+					}
+
 					// Update gui widgets properties
 					ScanSimAfter();
-					
+
 					// update gui widgets with results
 					UpdateSimControls(true);
+
 				}
 			}
 
 		}
-		
-		
-		
-		
+
+
 		/// <summary>
 		/// Updates during sim contacts writing
 		/// </summary>
 		private void WritingUpdate()
 		{
 			PBar.Adjustment.Value = (double)GlobalObjUI.SimADNPosition;
-			StatusBar.Push(1, GlobalObjUI.LMan.GetString("writecontact") + 
-				              GlobalObjUI.SimADNPosition.ToString("d3"));
+			StatusBar.Push(1, GlobalObjUI.LMan.GetString("writecontact") +
+							  GlobalObjUI.SimADNPosition.ToString("d3"));
 			MainClass.GtkWait();
-			
-			
+
 			if (GlobalObjUI.SimADNStatus == 3)
 			{
 				// End with errors
@@ -587,7 +545,7 @@ namespace monosimgtk
 				//ScanSimAfter();
 				SimConnect();
 			}
-			
+
 			// check for sim write ended
 			if (GlobalObjUI.SimADNStatus != 1)
 			{
@@ -595,14 +553,9 @@ namespace monosimgtk
 				//ScanSimAfter();
 				SimConnect();
 			}
-		}		
-		
-		
-		
-		
-		
-		
-		
+		}
+
+
 		/// <summary>
 		/// Update sim widgets status
 		/// </summary>
@@ -614,23 +567,23 @@ namespace monosimgtk
 			MenuSimDeleteAll.Sensitive = isSensitive;
 			MenuSimPin.Sensitive = isSensitive;
 			MenuSimDisconnect.Sensitive = isSensitive;
-			
+
 			TbOpenSim.Sensitive = !isSensitive;
 			TbSaveSimSim.Sensitive = isSensitive;
 			TbSaveSimFile.Sensitive = isSensitive;
 			TbChangePin.Sensitive = isSensitive;
 			TbCloseSim.Sensitive = isSensitive;
 			LstSimContacts.Sensitive = isSensitive;
-			
+
 			if (isSensitive)
 			{
 				// add iccid to frame label
 				LblSim.Markup = "<b>" + GlobalObjUI.LMan.GetString("framesim") + "</b> [" +
-					GlobalObjUI.SimIccID + " - size: " + GlobalObjUI.SimADNRecordCount.ToString() + "]"; 
-				
-				StatusBar.Push(1, GlobalObjUI.LMan.GetString("recordnoempty") + 
-					              GlobalObjUI.SimADNRecordNoEmpty.ToString());
-				
+					GlobalObjUI.SimICCID + " - size: " + GlobalObjUI.SimADNRecordCount.ToString() + "]";
+
+				StatusBar.Push(1, GlobalObjUI.LMan.GetString("recordnoempty") +
+								  GlobalObjUI.SimADNRecordNoEmpty.ToString());
+
 				// check for File area enabled
 				if (LstFileContacts.Sensitive)
 				{
@@ -653,8 +606,7 @@ namespace monosimgtk
 			}
 		}
 
-		
-		
+
 		/// <summary>
 		/// Enable only change pin1 and disconnect controls
 		/// </summary>
@@ -664,11 +616,10 @@ namespace monosimgtk
 			TbOpenSim.Sensitive = false;
 			MenuSimPin.Sensitive = true;
 			TbChangePin.Sensitive = true;
-			MenuSimDisconnect.Sensitive = true;			
+			MenuSimDisconnect.Sensitive = true;
 			TbCloseSim.Sensitive = true;
-			
 		}
-		
+
 
 		/// <summary>
 		/// Update file widgets status
@@ -680,15 +631,15 @@ namespace monosimgtk
 			MenuFileSaveFile.Sensitive = isSensitive;
 			MenuFileSaveSim.Sensitive = isSensitive;
 			MenuFileClose.Sensitive = isSensitive;
-			
+
 			TbNew.Sensitive = !isSensitive;
 			TbOpen.Sensitive = !isSensitive;
 			TbSaveFile.Sensitive = isSensitive;
 			TbSaveSim.Sensitive = isSensitive;
 			TbClose.Sensitive = isSensitive;
 			LstFileContacts.Sensitive = isSensitive;
-			
-			
+
+
 			if (isSensitive)
 			{
 				// add filename to frame label
@@ -696,10 +647,10 @@ namespace monosimgtk
 				if (GlobalObjUI.ContactsFilePath != "")
 				{
 					LblFile.Markup = "<b>" + GlobalObjUI.LMan.GetString("framefile") + "</b>" +
-						" [" + Path.GetFileNameWithoutExtension(GlobalObjUI.ContactsFilePath) + 
-					" - size: " + GlobalObjUI.FileContacts.SimContacts.Count.ToString() + "]"; 
-				}				
-				
+						" [" + Path.GetFileNameWithoutExtension(GlobalObjUI.ContactsFilePath) +
+					" - size: " + GlobalObjUI.FileContacts.SimContacts.Count.ToString() + "]";
+				}
+
 				// check for sim power on
 				if (LstSimContacts.Sensitive)
 				{
@@ -720,12 +671,8 @@ namespace monosimgtk
 				TbSaveSim.Sensitive = isSensitive;
 			}
 		}
-		
-		
-		
-		
-		
-		
+
+
 		/// <summary>
 		/// Set gui widgets before sim scan
 		/// </summary>
@@ -744,8 +691,7 @@ namespace monosimgtk
 			MainClass.GtkWait();
 		}
 
-		
-		
+
 		/// <summary>
 		/// Set gui widgets after sim scan
 		/// </summary>
@@ -758,81 +704,78 @@ namespace monosimgtk
 			FrameFile.Sensitive = true;
 			MainClass.GtkWait();
 		}
-		
-		
-		
-		
+
+
 		/// <summary>
 		/// Choose file to save contacts.
 		/// </summary>
 		private string ChooseFileToSave(string dialogTitle)
 		{
 			string fileToSave = "";
-			
-			// New dialog to save sim contacts on file 
-			Gtk.FileChooserDialog FileBox = new Gtk.FileChooserDialog(dialogTitle, 
-			                                MainWindow,
-			                                FileChooserAction.Save, 
-			                                GlobalObjUI.LMan.GetString("cancellbl"), Gtk.ResponseType.Cancel,
-                                            GlobalObjUI.LMan.GetString("savelbl"), Gtk.ResponseType.Accept);
-			
+
+			// New dialog to save sim contacts on file
+			Gtk.FileChooserDialog FileBox = new Gtk.FileChooserDialog(dialogTitle,
+											MainWindow,
+											FileChooserAction.Save,
+											GlobalObjUI.LMan.GetString("cancellbl"), Gtk.ResponseType.Cancel,
+											GlobalObjUI.LMan.GetString("savelbl"), Gtk.ResponseType.Accept);
+
 			// Filter for using only monosim files
-			Gtk.FileFilter myFilter = new Gtk.FileFilter(); 
+			Gtk.FileFilter myFilter = new Gtk.FileFilter();
 			myFilter.AddPattern("*.monosim");
 			myFilter.Name = "monosim files";
 			FileBox.AddFilter(myFilter);
-			
+
 			// Manage result of dialog box
 			FileBox.Icon = Gdk.Pixbuf.LoadFromResource("monosim.png");
 			int retFileBox = FileBox.Run();
 			if ((ResponseType)retFileBox == Gtk.ResponseType.Accept)
-			{	
+			{
 				// path of a right file returned
 				fileToSave = FileBox.Filename;
-				
+
 				string chkfile = fileToSave.PadLeft(9).ToLower();
 				if (chkfile.Substring(chkfile.Length-8) != ".monosim")
 				{
 					fileToSave += ".monosim";
 				}
-				
+
 				FileBox.Destroy();
-				FileBox.Dispose();				
+				FileBox.Dispose();
 			}
 			else
 			{
-				// nothing returned				
+				// nothing returned
 				FileBox.Destroy();
 				FileBox.Dispose();
 				return "";
 			}
-			
+
 			return fileToSave;
 		}
-		
-		
-		
+
+
 		/// <summary>
 		/// Write contacts on file
 		/// </summary>
 		private void WriteContactsOnFile(string filePath, List<Contact> contacts)
 		{
-			
+
 			try
 			{
 				// save contacts
 				StreamWriter sw = new StreamWriter(filePath,false);
-				
+
 				foreach(Contact cnt in contacts)
 				{
 					sw.WriteLine(cnt.Description);
 					sw.WriteLine(cnt.PhoneNumber);
 				}
-				
+
 				sw.Close();
 				sw.Dispose();
-				sw = null;			
-				
+				sw = null;
+
 			}
 			catch (Exception Ex)
 			{
@@ -840,15 +783,11 @@ namespace monosimgtk
 				MainClass.ShowMessage(MainWindow, "ERROR", Ex.Message, MessageType.Error);
 				return;
 			}
-			
+
 			MainClass.ShowMessage(MainWindow, "INFO", GlobalObjUI.LMan.GetString("filesaved"),MessageType.Info);
 		}
-		
-		
-		
-		
-		
-		
+
+
 		/// <summary>
 		/// Write passed contacts on sim card (append or override)
 		/// </summary>
@@ -858,30 +797,24 @@ namespace monosimgtk
 			if (!isAppend && (contacts.SimContacts.Count > GlobalObjUI.SimADNRecordCount))
 			{
 				// No enough space on sim
-				MainClass.ShowMessage(MainWindow, "ERROR", 
+				MainClass.ShowMessage(MainWindow, "ERROR",
 					GlobalObjUI.LMan.GetString("nosimspace"), MessageType.Error);
 				return;
 			}
-			
-			if (isAppend && (contacts.SimContacts.Count > (GlobalObjUI.SimADNRecordCount - 
-				                                           GlobalObjUI.SimADNRecordNoEmpty)))
+
+			if (isAppend && (contacts.SimContacts.Count > (GlobalObjUI.SimADNRecordCount -
+														   GlobalObjUI.SimADNRecordNoEmpty)))
 			{
 				// No enough space on sim
-				MainClass.ShowMessage(MainWindow, "ERROR", 
+				MainClass.ShowMessage(MainWindow, "ERROR",
 					GlobalObjUI.LMan.GetString("nosimspace"), MessageType.Error);
 				return;
 			}
-			
-			SimUpdate(contacts, isAppend);			
+
+			SimUpdate(contacts, isAppend);
 		}
-		
-		
-		
-		
-		
+
+
 		#endregion Private methods
-		
-		
 	}
-	
 }
