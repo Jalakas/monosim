@@ -5,73 +5,54 @@ using System.Text;
 using System.Collections.Generic;
 using System.Reflection;
 
-using log4net;
 using comexbase;
+using log4net;
 
 namespace monosimbase
 {
 	public static partial class GlobalObjUI
 	{
-
 		// Attributes
-		private static string languageFolder = "";
-		private static string languageTag = "";
-		private static string retStr = "";
+		// Log4Net object
+		private static readonly ILog log = LogManager.GetLogger(typeof(GlobalObjUI));
 		private static LanguageManager lMan = null;
-
 		private static int lenAlpha2 = 0;
+		private static int tonNpiNumber = 0;
 		private static string alphaID = "";
-		private static string numLength = "";
-		private static string tonNpi = "";
 		private static string dialNum = "";
 		// private static string configId = "";
 		// private static string ext1Rec = "";
-		private static int tonNpiNumber = 0;
-
-
-		// Log4Net object
-		private static readonly ILog log = LogManager.GetLogger(typeof(GlobalObjUI));
-
-
-		/// <summary>
-		/// Application folder path
-		/// </summary>
-		public static string AppPath { get; set; }
-
+		private static string languageFolder = "";
+		private static string languageTag = "";
+		private static string numLength = "";
+		private static string retStr = "";
+		private static string tonNpi = "";
 
 		#region Properties
 
-
-		/// <summary>
-		/// Return language manager object
-		/// </summary>
+		// Return language manager object
 		public static LanguageManager LMan { get { return lMan; } }
-
-
-
-		public static string ContactsFilePath {get; set;}
-		public static Contacts SimContacts {get; set;}
 		public static Contacts FileContacts {get; set;}
-
-		public static string SimICCID {get; set;}
+		public static Contacts SimContacts {get; set;}
+		public static List<int> SimADNRecordEmptyID {get; set;}
+		// Application folder path
+		public static string AppPath {get; set;}
+		public static string ContactsFilePath {get; set;}
 		public static string SimADNError {get; set;}
+		public static string SimICCID {get; set;}
 		public static bool SimPin1Status {get; set;}
 		public static int SimPin1Attempts {get; set;}
-		public static int SimADNStatus {get; set;}
-		public static int SimADNPosition {get; set;}
-		public static int SimADNRecordLen {get; set;}
 		public static int SimADNFileLen {get; set;}
-		public static int SimADNRecordCount {get; set;}
-		public static int SimADNRecordNoEmpty {get; set;}
 		public static int SimADNMaxAlphaChars {get; set;}
-		public static List<int> SimADNRecordEmptyID {get; set;}
+		public static int SimADNPosition {get; set;}
+		public static int SimADNRecordCount {get; set;}
+		public static int SimADNRecordLen {get; set;}
+		public static int SimADNRecordNoEmpty {get; set;}
+		public static int SimADNStatus {get; set;}
 		public static int SimADNVersion {get; set;}
 
 		#endregion Properties
-
-
 		#region Public Methods
-
 
 		/// <summary>
 		/// Set language to use
@@ -161,8 +142,6 @@ namespace monosimbase
 
 
 		#endregion Public Methods
-
-
 		#region Private Methods
 
 
