@@ -229,7 +229,7 @@ namespace monosimgtk
 		/// <summary>
 		/// Perform sim card connection and contacts read.
 		/// </summary>
-		private void SimConnect(bool extended=false)
+		private void SimConnect()
 		{
 			MainClass.GtkWait();
 
@@ -251,8 +251,8 @@ namespace monosimgtk
 				return;
 			}
 
-			// read sim contacts and fill list (first time false=main list and second time true=extended list)
-			retStr = GlobalObjUI.SelectSimContactsList(extended);
+			// read sim contacts and fill list
+			retStr = GlobalObjUI.SelectSimContactsList();
 
 			// check for error
 			if (retStr != "")
@@ -274,7 +274,7 @@ namespace monosimgtk
 			}
 
 			ScanSimBefore();
-			if (extended==false) lstSimContacts.Clear();
+			if (GlobalObjUI.SimADNVersion < 2) lstSimContacts.Clear();
 
 			// Reset status values
 			GlobalObjUI.SimADNStatus = 1;
@@ -509,11 +509,11 @@ namespace monosimgtk
 						lstSimContacts.AppendValues(new string[]{cnt.Description, cnt.PhoneNumber });
 					}
 
-					if (GlobalObjUI.SimADNextended == false)
+					if (GlobalObjUI.SimADNVersion == 1)
 					{
-						log.Debug("MainWindowClass::ReadingUpdate: finished reading ADN, let's try ADN extended read");
-						GlobalObjUI.SimADNextended = true;
-						SimConnect(true);
+						log.Debug("MainWindowClass::ReadingUpdate: finished reading modern ADN, let's try ADN extended read");
+						GlobalObjUI.SimADNVersion = 2;
+						SimConnect();
 					}
 
 					// Update gui widgets properties

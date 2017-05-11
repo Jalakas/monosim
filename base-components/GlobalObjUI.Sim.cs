@@ -68,8 +68,8 @@ namespace monosimbase
 		/// </summary>
 		public static void ReadSimContactsList()
 		{
-			string emptyRecord = new string('F', SimADNRecordLen * 2) + "9000";
-			string expRecord = new string('?', SimADNRecordLen * 2) + "9000";
+			string recordEmpty = new string('F', SimADNRecordLen * 2) + "9000";
+			string recordExp = new string('?', SimADNRecordLen * 2) + "9000";
 			string retCmd = "";
 
 			SimADNRecordNoEmpty = 0;
@@ -80,17 +80,17 @@ namespace monosimbase
 			// loop for each ADN records
 			for (int l=1; l <= SimADNRecordCount; l++)
 			{
-				// Set record id
+				// set record id
 				SimADNPosition = l;
 
-				// Prepare sim command
+				// prepare sim command
 				simCommand = "A0B2" + l.ToString("X2") + "04" + SimADNRecordLen.ToString("X2");
-				simExpResponse = expRecord;
+				simExpResponse = recordExp;
 				simResponse = "";
 				simRespOk = false;
 				retCmd = SendReceiveAdv(simCommand, ref simResponse, simExpResponse, ref simRespOk);
-				log.Debug("GlobalObjUI.Sim::ReadSimContactsList: READ ADN REC " +
-						  l.ToString("d3") + " " + simResponse);
+				log.Debug("GlobalObjUI.Sim::ReadSimContactsList: READ ADN" + GlobalObjUI.SimADNVersion + " REC " +
+						 l.ToString("d3") + " " + simResponse);
 
 				if (retCmd != "")
 				{
@@ -102,7 +102,6 @@ namespace monosimbase
 					return;
 				}
 
-
 				if (!simRespOk)
 				{
 					// wrong response
@@ -113,19 +112,17 @@ namespace monosimbase
 					return;
 				}
 
-
 				// check for not empty records
-				if (simResponse != emptyRecord)
+				if (simResponse != recordEmpty)
 				{
 					// increment counter of not empty records
 					SimADNRecordNoEmpty++;
-
 					// update records list
 					ADNrecords.Add(simResponse.Substring(0, simResponse.Length-4));
 				}
 				else
 				{
-					// Add to Empty record list
+					// add to Empty record list
 					SimADNRecordEmptyID.Add(l);
 				}
 
@@ -133,12 +130,10 @@ namespace monosimbase
 				MonosimEvent(new object(), new EventArgs());
 			}
 
-
 			SimADNStatus = 2;
 
 			// send notify to gui
 			MonosimEvent(new object(), new EventArgs());
-
 		}
 
 
@@ -147,8 +142,8 @@ namespace monosimbase
 		/// </summary>
 		public static void WriteSimContactsList(Contacts contacts, bool isAppend)
 		{
-			string emptyRecord = new string('F', SimADNRecordLen * 2);
-			string expRecord = "9000";
+			string recordEmpty = new string('F', SimADNRecordLen * 2);
+			string recordExp = "9000";
 			string retCmd = "";
 			string retRecord = "";
 			int ADNRec = 0;
@@ -167,10 +162,10 @@ namespace monosimbase
 					ADNRec = SimADNRecordEmptyID[cid];
 				}
 
-				// Set record id
+				// set record id
 				SimADNPosition = ADNRec;
 
-				// Prepare sim command
+				// prepare sim command
 				simCommand = "A0DC" + ADNRec.ToString("X2") + "04" + SimADNRecordLen.ToString("X2");
 
 				retStr = PrepareRecord(contacts.SimContacts[cid], out retRecord);
@@ -185,12 +180,12 @@ namespace monosimbase
 				}
 
 				simCommand += retRecord;
-				simExpResponse = expRecord;
+				simExpResponse = recordExp;
 				simResponse = "";
 				simRespOk = false;
 				retCmd = SendReceiveAdv(simCommand, ref simResponse, simExpResponse, ref simRespOk);
 
-				log.Debug("GlobalObjUI.Sim::WriteSimContactsList: WRITE ADN REC " +
+				log.Debug("GlobalObjUI.Sim::WriteSimContactsList: WRITE ADN" + GlobalObjUI.SimADNVersion + " REC " +
 						  ADNRec.ToString("d3") + " " + simCommand + " < " + simResponse);
 
 				if (retCmd != "")
@@ -208,7 +203,6 @@ namespace monosimbase
 					// wrong response
 					SimADNError = "WRONG RESPONSE: [" + simExpResponse + "] - [" + simResponse + "]";
 					SimADNStatus = 3;
-
 					// send notify to gui
 					MonosimEvent(new object(), new EventArgs());
 					return;
@@ -229,13 +223,13 @@ namespace monosimbase
 						SimADNPosition = rid;
 
 						simCommand = "A0DC" + rid.ToString("X2") + "04" + SimADNRecordLen.ToString("X2") +
-									 emptyRecord;
-						simExpResponse = expRecord;
+									 recordEmpty;
 						simResponse = "";
+						simExpResponse = recordExp;
 						simRespOk = false;
 						retCmd = SendReceiveAdv(simCommand, ref simResponse, simExpResponse, ref simRespOk);
 
-						log.Debug("GlobalObjUI.Sim::WriteSimContactsList: WRITE ADN REC " +
+						log.Debug("GlobalObjUI.Sim::WriteSimContactsList: WRITE ADN" + GlobalObjUI.SimADNVersion + " REC " +
 							  rid.ToString("d3") + " " + simCommand + " < " + simResponse);
 
 						if (retCmd != "")
@@ -248,13 +242,11 @@ namespace monosimbase
 							return;
 						}
 
-
 						if (!simRespOk)
 						{
 							// wrong response
 							SimADNError = "WRONG RESPONSE: [" + simExpResponse + "] - [" + simResponse + "]";
 							SimADNStatus = 3;
-
 							// send notify to gui
 							MonosimEvent(new object(), new EventArgs());
 							return;
@@ -262,16 +254,13 @@ namespace monosimbase
 
 						// send notify to gui
 						MonosimEvent(new object(), new EventArgs());
-
 					}
 				}
 			}
 
 			SimADNStatus = 2;
-
 			// send notify to gui
 			MonosimEvent(new object(), new EventArgs());
-
 		}
 
 
@@ -280,8 +269,8 @@ namespace monosimbase
 		/// </summary>
 		public static void DeleteAllSimContactsList()
 		{
-			string emptyRecord = new string('F', SimADNRecordLen * 2);
-			string expRecord = "9000";
+			string recordEmpty = new string('F', SimADNRecordLen * 2);
+			string recordExp = "9000";
 			string retCmd = "";
 
 			for (int rid=1; rid<=GlobalObjUI.SimADNRecordCount; rid++)
@@ -293,13 +282,12 @@ namespace monosimbase
 					SimADNPosition = rid;
 
 					simCommand = "A0DC" + rid.ToString("X2") + "04" + SimADNRecordLen.ToString("X2") +
-								 emptyRecord;
-					simExpResponse = expRecord;
+								 recordEmpty;
+					simExpResponse = recordExp;
 					simResponse = "";
 					simRespOk = false;
 					retCmd = SendReceiveAdv(simCommand, ref simResponse, simExpResponse, ref simRespOk);
-
-					log.Debug("GlobalObjUI.Sim::DeleteAllSimContactsList: WRITE ADN REC " +
+					log.Debug("GlobalObjUI.Sim::DeleteAllSimContactsList: WRITE ADN" + GlobalObjUI.SimADNVersion + " REC " +
 						  rid.ToString("d3") + " " + simCommand + " < " + simResponse);
 
 					if (retCmd != "")
@@ -312,13 +300,11 @@ namespace monosimbase
 						return;
 					}
 
-
 					if (!simRespOk)
 					{
 						// wrong response
 						SimADNError = "WRONG RESPONSE: [" + simExpResponse + "] - [" + simResponse + "]";
 						SimADNStatus = 3;
-
 						// send notify to gui
 						MonosimEvent(new object(), new EventArgs());
 						return;
@@ -330,7 +316,6 @@ namespace monosimbase
 			}
 
 			SimADNStatus = 2;
-
 			// send notify to gui
 			MonosimEvent(new object(), new EventArgs());
 
@@ -370,7 +355,6 @@ namespace monosimbase
 				// error detected
 				return retStr;
 			}
-
 
 			if (!simRespOk)
 			{
@@ -480,7 +464,6 @@ namespace monosimbase
 				return "WRONG RESPONSE [" + simExpResponse + "] " + "[" + simResponse + "]";
 			}
 
-
 			// Get Response
 			simCommand = "A0C00000" + simResponse.Substring(2,2);
 			simExpResponse = new string('?', (Convert.ToInt32(simResponse.Substring(2,2), 16) * 2)) + "9000";
@@ -516,7 +499,6 @@ namespace monosimbase
 			log.Debug("GlobalObjUI.Sim::GetSimPinStatus: PIN1 VERIFY ATTEMPTS: " + SimPin1Attempts.ToString());
 
 			return "";
-
 		}
 
 
@@ -572,11 +554,11 @@ namespace monosimbase
 		/// </summary>
 		private static string ReadADN()
 		{
-			// Select 7F10 (DF TELECOM)
+			// Select 7F10 (DF_TELECOM) 3GPP TS 31.102 V5.14.0 (2005-10) page 108
 			simCommand = "A0A40000027F10";
 			simExpResponse = "9F??";
 			string retCmd = SendReceiveAdv(simCommand, ref simResponse, simExpResponse, ref simRespOk);
-			log.Debug("GlobalObjUI.Sim::ReadADN: SELECT DF TELECOM " + simResponse);
+			log.Debug("GlobalObjUI.Sim::ReadADN: SELECT DF_TELECOM " + simResponse);
 
 			if (retCmd != "")
 			{
@@ -588,12 +570,57 @@ namespace monosimbase
 				return "WRONG RESPONSE [" + simExpResponse + "] " + "[" + simResponse + "]";
 			}
 
+			if (GlobalObjUI.SimADNVersion > 0)
+			{
+				// Select 5F3A (DF_PHONEBOOK) 3GPP TS 31.102 V5.14.0 (2005-10) page 108
+				simCommand = "A0A40000025F3A";
+				simExpResponse = "9F??";
+				retCmd = SendReceiveAdv(simCommand, ref simResponse, simExpResponse, ref simRespOk);
+				log.Debug("GlobalObjUI.Sim::ReadADN: SELECT DF_PHONEBOOK " + simResponse);
+			}
+			else
+			{
+				// Select 6F3A (ADN)
+				simCommand = "A0A40000026F3A";
+				simExpResponse = "9F??";
+				retCmd = SendReceiveAdv(simCommand, ref simResponse, simExpResponse, ref simRespOk);
+				log.Debug("GlobalObjUI.Sim::ReadADN: SELECT ADN" + GlobalObjUI.SimADNVersion + " " + simResponse);
+			}
 
-			// Select 6F3A (ADN)
-			simCommand = "A0A40000026F3A";
-			simExpResponse = "9F??";
-			retCmd = SendReceiveAdv(simCommand, ref simResponse, simExpResponse, ref simRespOk);
-			log.Debug("GlobalObjUI.Sim::ReadADN: SELECT ADN " + simResponse);
+			if (retCmd != "")
+			{
+				return retCmd ;
+			}
+
+			if (!simRespOk)
+			{
+				if (GlobalObjUI.SimADNVersion == 1 && simResponse == "9404")
+				{
+					log.Error("GlobalObjUI.Sim::ReadADN: Failed to read  DF_PHONEBOOK, fall back to ADN");
+					GlobalObjUI.SimADNVersion = 0;
+					GlobalObjUI.SelectSimContactsList();
+					return "";
+				}
+				else return "WRONG RESPONSE [" + simExpResponse + "] " + "[" + simResponse + "]";
+			}
+
+			if (GlobalObjUI.SimADNVersion == 2)
+			{
+				// Select 4F3B (EF_ADN extended) 3GPP TS 31.102 V5.14.0 (2005-10) page 141
+				simCommand = "A0A40000024F3B";
+				simExpResponse = "9F??";
+				retCmd = SendReceiveAdv(simCommand, ref simResponse, simExpResponse, ref simRespOk);
+				log.Debug("GlobalObjUI.Sim::ReadADN: SELECT EF_ADN(extended) " + simResponse);
+			}
+			else if (GlobalObjUI.SimADNVersion == 1)
+			{
+				// Select 4F3A (EF_ADN) 3GPP TS 31.102 V5.14.0 (2005-10) page 141
+				simCommand = "A0A40000024F3A";
+				simExpResponse = "9F??";
+				retCmd = SendReceiveAdv(simCommand, ref simResponse, simExpResponse, ref simRespOk);
+				log.Debug("GlobalObjUI.Sim::ReadADN: SELECT EF_ADN " + simResponse);
+			}
+			// GlobalObjUI.SimADNVersion=0 doesn't need here more subfolder selects
 
 			if (retCmd != "")
 			{
@@ -605,10 +632,9 @@ namespace monosimbase
 				return "WRONG RESPONSE [" + simExpResponse + "] " + "[" + simResponse + "]";
 			}
 
-
-			// Get Response 6F3A (ADN)
-			simCommand = "A0C00000" + simResponse.Substring(2,2);
-			simExpResponse = new string('?', Convert.ToInt32(simResponse.Substring(2,2), 16) * 2) + "9000";
+			// Get Response
+			simCommand = "A0C00000" + simResponse.Substring(2, 2);
+			simExpResponse = new string('?', Convert.ToInt32(simResponse.Substring(2, 2), 16) * 2) + "9000";
 			retCmd = SendReceiveAdv(simCommand, ref simResponse, simExpResponse, ref simRespOk);
 			log.Debug("GlobalObjUI.Sim::ReadADN: GET RESPONSE " + simResponse);
 
@@ -622,7 +648,6 @@ namespace monosimbase
 				return "WRONG RESPONSE [" + simExpResponse + "] " + "[" + simResponse + "]";
 			}
 
-
 			// Update ADN values
 			SimADNRecordLen = Convert.ToInt32(simResponse.Substring(28, 2), 16);
 			SimADNFileLen = Convert.ToInt32(simResponse.Substring(4, 4), 16);
@@ -633,7 +658,6 @@ namespace monosimbase
 			log.Debug("GlobalObjUI.Sim::ReadADN: Record len .... : " + SimADNRecordLen.ToString());
 			log.Debug("GlobalObjUI.Sim::ReadADN: Record count .. : " + SimADNRecordCount.ToString());
 			log.Debug("GlobalObjUI.Sim::ReadADN: Max Alpha chars : " + SimADNMaxAlphaChars.ToString());
-
 
 			return "";
 		}

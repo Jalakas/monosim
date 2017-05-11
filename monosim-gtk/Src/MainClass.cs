@@ -81,6 +81,7 @@ namespace monosimgtk
 				return;
 			}
 
+			GlobalObjUI.SimADNVersion = 1;
 
 			// create new Gtk Gui for application and show it
 			MainWindowClass mwc = new MainWindowClass();
