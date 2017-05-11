@@ -71,10 +71,13 @@ namespace monosimbase
 			string recordExp = new string('?', SimADNRecordLen * 2) + "9000";
 			string retCmd = "";
 
-			SimADNRecordNoEmpty = 0;
-			ADNrecords = new List<string>();
-			SimADNRecordEmptyID = new List<int>();
-			SimContacts = new Contacts();
+			if (SimADNVersion < 2)
+			{
+				ADNrecords = new List<string>();
+				SimADNRecordNotEmpty = 0;
+				SimADNRecordEmptyID = new List<int>();
+				SimContacts = new Contacts();
+			}
 
 			// loop for each ADN records
 			for (int l=1; l <= SimADNRecordCount; l++)
@@ -113,7 +116,7 @@ namespace monosimbase
 				if (simResponse != recordEmpty)
 				{
 					// increment counter of not empty records
-					SimADNRecordNoEmpty++;
+					SimADNRecordNotEmpty++;
 					// update records list
 					ADNrecords.Add(simResponse.Substring(0, simResponse.Length-4));
 				}
@@ -639,6 +642,7 @@ namespace monosimbase
 			// Update ADN values
 			SimADNFileLen = Convert.ToInt32(simResponse.Substring(4, 4), 16);
 			SimADNRecordLen = Convert.ToInt32(simResponse.Substring(28, 2), 16);
+
 			SimADNRecordCount = GlobalObjUI.SimADNFileLen / GlobalObjUI.SimADNRecordLen;
 			SimADNMaxAlphaChars = GlobalObjUI.SimADNRecordLen - 14;
 

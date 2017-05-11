@@ -515,6 +515,10 @@ namespace monosimgtk
 						GlobalObjUI.SimADNVersion = 2;
 						SimConnect();
 					}
+					else if (GlobalObjUI.SimADNVersion == 2)
+					{
+						GlobalObjUI.SimADNVersion = 1;
+					}
 
 					// Update gui widgets properties
 					ScanSimAfter();
@@ -582,7 +586,7 @@ namespace monosimgtk
 					GlobalObjUI.SimICCID + " - size: " + GlobalObjUI.SimADNRecordCount.ToString() + "]";
 
 				StatusBar.Push(1, GlobalObjUI.LMan.GetString("recordnoempty") +
-								  GlobalObjUI.SimADNRecordNoEmpty.ToString());
+								  GlobalObjUI.SimADNRecordNotEmpty.ToString());
 
 				// check for File area enabled
 				if (LstFileContacts.Sensitive)
@@ -803,7 +807,7 @@ namespace monosimgtk
 			}
 
 			if (isAppend && (contacts.SimContacts.Count > (GlobalObjUI.SimADNRecordCount -
-														   GlobalObjUI.SimADNRecordNoEmpty)))
+														   GlobalObjUI.SimADNRecordNotEmpty)))
 			{
 				// No enough space on sim
 				MainClass.ShowMessage(MainWindow, "ERROR",

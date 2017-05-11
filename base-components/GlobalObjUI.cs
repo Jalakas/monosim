@@ -47,7 +47,7 @@ namespace monosimbase
 		public static int SimADNPosition {get; set;}
 		public static int SimADNRecordCount {get; set;}
 		public static int SimADNRecordLen {get; set;}
-		public static int SimADNRecordNoEmpty {get; set;}
+		public static int SimADNRecordNotEmpty {get; set;}
 		public static int SimADNStatus {get; set;}
 		public static int SimADNVersion {get; set;}
 
